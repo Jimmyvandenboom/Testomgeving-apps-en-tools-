@@ -93,3 +93,35 @@ dialog { border-radius: 12px; border-top: 3px solid var(--blue); }
   .card { padding: 18px; }
   .grid { gap: 14px; }
 }
+
+.card-tools { display:flex; gap:2px; }
+.favorite { min-width:48px; padding:10px; border-color:transparent; background:transparent; color:var(--muted); }
+.favorite svg { width:22px; height:22px; }
+.favorite[aria-pressed="true"] { color:#ffd06a; }
+.card.is-favorite { border-top-color:#ffd06a; }
+.app-icon svg { width:32px; height:32px; }
+.app-icon img { width:100%; height:100%; object-fit:cover; border-radius:8px; }
+.reorder-controls { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); }
+.reorder-handle { cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+.reorder-handle svg { width:20px; height:20px; }
+.reorder-arrows { display:flex; gap:8px; }
+.reorder-arrows button { min-width:48px; }
+button:disabled { opacity:.4; cursor:default; }
+button[aria-pressed="true"]#reorder-apps { border-color:var(--blue); background:#163b58; }
+.card.dragging { opacity:.45; }
+.card.drop-target { outline:3px dashed var(--blue); outline-offset:3px; }
+.hub-settings { padding:22px; margin-top:24px; background:#0e2034; border:1px solid var(--line); border-radius:12px; }
+.hub-settings h2 { font-size:18px; margin:0 0 8px; }
+.hub-settings p { color:var(--muted); font-size:14px; line-height:1.6; }
+.settings-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.version-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+#app-version { font-size:13px; color:var(--muted); }
+select { width:100%; min-height:50px; padding:12px; border:1px solid #4a607f; border-radius:10px; background:var(--bg); color:var(--white); font:inherit; font-size:16px; }
+select:focus-visible { outline:3px solid var(--blue); outline-offset:4px; }
+#icon-file { font-size:14px; }
+#image-controls { display:flex; align-items:center; gap:12px; margin-top:12px; }
+#icon-preview { border-radius:8px; object-fit:cover; }
+@media(max-width:480px) { .hub-settings{padding:18px} .settings-actions{display:grid;grid-template-columns:1fr} }
+textarea { width:100%; resize:vertical; padding:12px; border:1px solid #4a607f; border-radius:10px; background:var(--bg); color:var(--white); font:inherit; font-size:16px; line-height:1.6; }
+textarea:focus-visible { outline:3px solid var(--blue); outline-offset:4px; }
+#save-work-context { margin-top:10px; }

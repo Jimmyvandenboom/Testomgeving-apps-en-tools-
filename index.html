@@ -24,15 +24,28 @@
       <p class="intro">Je apps en tools. Eén plek, altijd bij de hand.</p>
       <div class="toolbar">
         <button id="add-app" class="primary">＋ App toevoegen</button>
+        <button id="open-assistant">Werkassistent</button>
+        <button id="reorder-apps" aria-pressed="false">Volgorde wijzigen</button>
         <button id="install-app" hidden>Installeer app</button>
       </div>
     </header>
+    <p id="reorder-help" class="hint" hidden>Sleep aan de handgreep of gebruik de pijlen. Favorieten blijven bovenaan.</p>
     <section aria-label="Apps en tools" id="apps" class="grid"></section>
     <p id="status" role="status" class="status"></p>
     <aside class="install-tip">
       <svg class="tip-icon" aria-hidden="true" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18 18 6M6 6h12v12"/></svg>
       <div><h2>Ook op je beginscherm</h2><p id="install-help">iPhone: open in Safari, tik op Deel en kies ‘Zet op beginscherm’. Android: open in Chrome en kies ‘App installeren’ of ‘Toevoegen aan startscherm’ in het menu.</p></div>
     </aside>
+    <section class="hub-settings" aria-label="Back-up en updates">
+      <div><h2>Jouw apphub, overal</h2><p>Neem je links, iconen en volgorde mee naar een andere telefoon.</p></div>
+      <div class="settings-actions">
+        <button id="export-backup">Back-up downloaden</button>
+        <button id="import-backup">Back-up herstellen</button>
+        <input id="backup-file" type="file" accept="application/json,.json" hidden>
+      </div>
+      <div class="version-row"><span id="app-version"></span><button id="check-update">Controleer op updates</button></div>
+      <p id="update-status" role="status" class="hint"></p>
+    </section>
     <footer>Gemaakt voor Jimmy <span>•</span> Wijzigingen blijven op dit apparaat</footer>
   </main>
   <dialog id="editor" aria-labelledby="editor-title">
@@ -41,8 +54,19 @@
       <label for="app-name">Naam</label>
       <input id="app-name" name="name" required maxlength="80" autocomplete="off">
       <label for="app-url">Link <span class="optional">(mag leeg blijven)</span></label>
-      <input id="app-url" name="url" type="url" placeholder="https://…" inputmode="url" autocapitalize="none" autocomplete="off">
+      <input id="app-url" name="url" type="url" maxlength="2048" placeholder="https://…" inputmode="url" autocapitalize="none" autocomplete="off">
       <p class="hint">Gebruik een volledige http- of https-link.</p>
+      <label for="app-icon">Icoon</label>
+      <select id="app-icon">
+        <option value="auto">Automatisch</option><option value="mountain">Bergen / expeditie</option>
+        <option value="globe">Wereld / aardrijkskunde</option><option value="check">Beoordelen</option>
+        <option value="chat">Chat</option><option value="code">Code</option>
+        <option value="book">Lesmateriaal</option><option value="calendar">Rooster</option><option value="tool">Tool</option>
+      </select>
+      <label for="icon-file">Eigen afbeelding <span class="optional">(optioneel)</span></label>
+      <input id="icon-file" type="file" accept="image/png,image/jpeg,image/webp">
+      <div id="image-controls" hidden><img id="icon-preview" alt="Voorbeeld van je eigen appicoon" width="48" height="48"><button type="button" id="clear-icon">Afbeelding verwijderen</button></div>
+      <p class="hint">PNG, JPG of WebP, maximaal 2 MB. Je afbeelding blijft op dit apparaat.</p>
       <p id="form-error" class="error" role="alert"></p>
       <div class="dialog-actions"><button type="button" id="cancel-editor">Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
     </form>
@@ -51,6 +75,28 @@
     <h2 id="remove-title">App verwijderen?</h2>
     <p id="remove-message"></p>
     <div class="dialog-actions"><button id="cancel-remove">Annuleren</button><button id="confirm-remove" class="danger">Verwijderen</button></div>
+  </dialog>
+  <dialog id="restore-dialog" aria-labelledby="restore-title">
+    <h2 id="restore-title">Back-up herstellen?</h2>
+    <p id="restore-message"></p>
+    <p id="restore-error" class="error" role="alert"></p>
+    <p class="hint">Dit vervangt je huidige tegels. Download eerst een back-up als je die wilt bewaren.</p>
+    <div class="dialog-actions"><button id="cancel-restore">Annuleren</button><button id="confirm-restore" class="primary">Herstellen</button></div>
+  </dialog>
+  <dialog id="assistant-dialog" aria-labelledby="assistant-title">
+    <form id="assistant-form">
+      <h2 id="assistant-title">Mijn werkassistent</h2>
+      <p class="hint">Stel een vraag over je lessen, apps of projecten. Je voert het gesprek in ChatGPT, met de context die je hieronder meegeeft.</p>
+      <label for="work-context">Wat moet de assistent over je werk weten?</label>
+      <textarea id="work-context" rows="5" maxlength="10000" placeholder="Bijvoorbeeld: ik ben Jimmy, ik werk met AK MASTER, Expeditie IJsland en D&P. Mijn doelgroepen en projecten zijn…"></textarea>
+      <button id="save-work-context" type="button">Werkcontext bewaren</button>
+      <label for="assistant-question">Je vraag</label>
+      <textarea id="assistant-question" rows="3" maxlength="4000" required placeholder="Help me een les voorbereiden over…"></textarea>
+      <p class="hint">Alleen als je op ‘Bespreek in ChatGPT’ tikt, gaan je vraag en deze context naar ChatGPT. Voeg geen vertrouwelijke leerlinggegevens toe. ChatGPT kan om inloggen vragen.</p>
+      <p id="assistant-status" class="hint" role="status"></p>
+      <a href="https://chatgpt.com/" class="open" target="_blank" rel="noopener noreferrer">ChatGPT openen</a>
+      <div class="dialog-actions"><button type="button" id="copy-assistant">Vraag kopiëren</button><button id="close-assistant" type="button">Sluiten</button><button type="submit" class="primary">Bespreek in ChatGPT</button></div>
+    </form>
   </dialog>
 </body>
 </html>

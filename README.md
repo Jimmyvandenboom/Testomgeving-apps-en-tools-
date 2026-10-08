@@ -1,94 +1,64 @@
 # Mijn apps · Jimmy
 
-Een mobiele persoonlijke apphub, zonder framework, accounts, analytics of externe dependencies. De standaardtegels zijn Expeditie IJsland, AK MASTER, D&P beoordelen, ChatGPT en GitHub. Expeditie IJsland verwijst naar de IJsland-app. AK MASTER verwijst naar de AK MASTER-app. D&P beoordelen heeft nog geen link.
+Een mobiele persoonlijke apphub zonder framework, analytics of installatie van dependencies. De standaardtegels zijn Expeditie IJsland, AK MASTER, D&P beoordelen, ChatGPT en GitHub. IJsland en AK MASTER hebben hun links; D&P blijft leeg tot zijn link bekend is.
 
-## Gebruik
+Apphub: https://jimmyvandenboom.github.io/Testomgeving-apps-en-tools-/
 
-- Tik op **Link instellen** of **Link wijzigen** om een link en eventueel de naam te wijzigen. Gebruik een volledige `https://`-link; leeg laten mag.
-- **App toevoegen** maakt een nieuwe tegel. De **×** op een tegel verwijdert deze na bevestiging.
-- Wijzigingen staan alleen in `localStorage` van deze browser/installatie en dit webadres. Ze synchroniseren niet tussen telefoons. Het wissen van websitegegevens verwijdert je wijzigingen. Een andere domeinnaam of browser heeft een eigen verzameling.
-- Gebruik geen geheime tokens of wachtwoorden in app-links.
-- De apphub werkt na een eerste online bezoek offline. De gekoppelde externe apps hebben hun eigen internetverbinding en toegangsregels.
+## Gebruik — versie 1.3.0
+
+- **Openen** opent de gekoppelde app. **Link instellen / Link wijzigen** past naam, link en icoon aan. Een lege link is toegestaan. Schooltools, lesmateriaal en roosters kun je zelf toevoegen via **App toevoegen**.
+- De **ster** maakt een app favoriet; favorieten staan altijd bovenaan. De **×** verwijdert een tegel na bevestiging.
+- **Volgorde wijzigen** toont sleephandgrepen en grote pijlknoppen. Sleep de handgreep met je vinger of muis, of gebruik de pijlen. Je verplaatst tegels binnen de favorieten of de overige apps; zet de ster aan/uit om van groep te veranderen. Scroll buiten de handgrepen door de pagina.
+- IJsland, AK MASTER, D&P, ChatGPT en GitHub hebben herkenbare, lokaal getekende symbolen. Kies bij het wijzigen een ander symbool of upload een eigen PNG/JPG/WebP van maximaal 2 MB. De afbeelding wordt lokaal bijgesneden en verkleind tot 128 × 128 pixels. Er worden geen afbeeldingen naar een server gestuurd.
+- **Back-up downloaden** maakt een JSON-bestand met je apps, volgorde, favorieten, iconen en bewaarde werkcontext. **Back-up herstellen** leest het bestand en vraagt bevestiging voordat het je huidige tegels vervangt. Ongeldige back-ups en onveilige links worden geweigerd. Download eventueel eerst een back-up van je huidige gegevens.
+- Onder aan de pagina staan het versienummer en **Controleer op updates**. Bij een nieuwe versie verandert de knop in **Vernieuwen**. Een open formulier wordt niet automatisch herladen. Updates vereisen internet en een afgeronde hostingdeployment.
+- Je gegevens blijven in `localStorage` van deze browser/installatie en dit webadres. Ze synchroniseren niet vanzelf tussen telefoons. Gebruik een back-up voor overzetten. Het wissen van websitegegevens wist je wijzigingen; een andere browser of domeinnaam heeft zijn eigen gegevens.
+- De apphub werkt na een eerste online bezoek offline. Externe apps en ChatGPT hebben hun eigen internetverbinding en toegangsregels. Gebruik geen wachtwoorden of geheime tokens in app-links.
+
+## Werkassistent
+
+**Werkassistent** opent een venster waarin je informatie over je werk en een vraag kunt invullen. **Werkcontext bewaren** slaat die context lokaal op en neemt hem mee in back-ups.
+
+**Bespreek in ChatGPT** opent ChatGPT met je vraag, de ingevulde context en de namen van maximaal 30 apps. Je voert het AI-gesprek vervolgens in ChatGPT; de hub bevat geen eigen AI-model of backend. De assistent kent alleen wat je zelf meegeeft en heeft geen automatische toegang tot eerdere gesprekken, schooldocumenten of accounts. ChatGPT kan om inloggen vragen.
+
+De overdracht gebruikt de `q`-parameter in een ChatGPT-link. Ondersteuning daarvan kan door ChatGPT veranderen. Gebruik **Vraag kopiëren** en **ChatGPT openen** als de vraag niet automatisch verschijnt, of als de context te lang is voor een link. Werkcontext wordt uitsluitend naar ChatGPT gestuurd wanneer je daar zelf voor kiest; bewaren of back-ups maken verstuurt niets. De vraag/context kunnen in browsergeschiedenis en bij ChatGPT terechtkomen. Voeg geen vertrouwelijke leerlinggegevens toe. Een rechtstreeks geïntegreerde AI-chat met documentkoppelingen vereist later een beveiligde backend; zet nooit een API-sleutel in de openbare websitecode.
 
 ## Lokaal starten
 
-Open een terminal in deze repository:
+Open een terminal in de bestaande checkout (geen aparte Git-worktree nodig):
 
 ```sh
 python3 -m http.server 8080 --bind 127.0.0.1
 ```
 
-Open `http://localhost:8080` op dezelfde computer. Open de HTML niet rechtstreeks als bestand: voor de service worker is localhost of HTTPS nodig. Er is geen build- of installatiestap. Gebruik de bestaande checkout; een aparte Git-worktree is niet nodig.
+Open `http://localhost:8080` op dezelfde computer. Open HTML niet rechtstreeks als bestand: de service worker vereist localhost of HTTPS. Er is geen build- of installatiestap.
 
-## Online zetten zonder je repository openbaar te maken
+## Online bijwerken via GitHub Pages
 
-Er is door Codex niets gepusht, gedeployd of openbaar gemaakt. Je GitHub-repository kan privé blijven. **Een privérepository maakt een gehoste website niet automatisch privé.** Cloudflare Pages-websites zijn standaard toegankelijk voor iedereen die het adres kent. Kies zelf of dat gewenst is; configureer Cloudflare Access als alleen jij toegang mag hebben. Er worden geen gegevens uit localStorage naar de hosting gestuurd.
+De code wordt op verzoek naar `main` gepusht. GitHub Pages publiceert vanuit **Settings → Pages → Deploy from a branch → main → / (root)**. Wacht tot de Pages-deployment op GitHub is afgerond en open daarna het apphubadres. Gebruik **Controleer op updates** en zo nodig **Vernieuwen**. Bij een oudere installatie zonder updateknop: herlaad online, sluit de app en open opnieuw.
 
-### 1. Zet deze commit in je privérepository
+Het wijzigen van broncode verandert de zichtbaarheid van je repository niet. De Pages-website is openbaar toegankelijk volgens je GitHub-instellingen. Er is voor de hub geen aparte hostingdienst nodig. Op sommige GitHub-abonnementen vereist Pages een openbare repository; pas de zichtbaarheid alleen bewust zelf aan. Upload of commit geen persoonlijke back-ups of credentials.
 
-De code is lokaal gecommit op de huidige werkbranch. Controleer in GitHub dat de repository nog **Private** is. Push de commit via je gebruikelijke GitHub/Codex-workflow naar een branch en merge deze eventueel naar `main`. Maak de repository niet openbaar. Er is door deze taak geen push uitgevoerd.
+## Installeren op je telefoon
 
-### 2. Download de websitebestanden
+**iPhone:** open het HTTPS-adres in Safari → Deel → Zet op beginscherm → schakel Open als webapp in als die optie verschijnt → Voeg toe.
 
-Ga in GitHub naar de branch met de nieuwe commit, klik **Code → Download ZIP**, en pak de ZIP uit. Maak op je computer een map `jimmy-apphub` met uitsluitend:
+**Android:** open het HTTPS-adres in Chrome → Installeer app in de hub, of ⋮ → App installeren / Toevoegen aan startscherm → bevestig.
 
-```text
-index.html
-style.css
-app.js
-sw.js
-manifest.webmanifest
-icons/
-  icon.svg
-  icon-192.png
-  icon-512.png
-  icon-maskable-512.png
-  apple-touch-icon.png
-```
-
-`index.html` moet direct in die map staan. Upload geen `.git`, credentials of persoonlijke bestanden. De hostingprovider hoeft geen toegang tot je privérepository te krijgen.
-
-### 3. Kies toegang en upload via Cloudflare Pages
-
-1. Log in bij Cloudflare en ga naar **Workers & Pages**.
-2. Kies het aanmaken van een **Pages**-project en de optie **Direct Upload / Upload assets** (de exacte menutekst kan veranderen).
-3. Kies een projectnaam, bijvoorbeeld `jimmy-apphub`. Cloudflare bepaalt het definitieve `*.pages.dev`-adres; de naam moet beschikbaar zijn.
-4. Wil je een afgeschermde website? Configureer vóór de eerste productie-upload Cloudflare **Zero Trust → Access → Applications → Add application → Self-hosted** voor het definitieve productieadres. Voeg een **Allow**-beleid toe voor uitsluitend jouw e-mailadres en stel e-mailcodes als inlogmethode in. Bescherm ook eventuele previewadressen of gebruik die niet. De ingebouwde Pages-optie voor previewbeveiliging alleen beschermt het productieadres niet. Controleer de actuele Cloudflare-instructies voor productiebeveiliging van jouw Pages-domein; gebruik eventueel een eigen domein met Access. Publiceer pas wanneer het juiste adres beschermd is.
-5. Upload de inhoud van `jimmy-apphub` via de uploadfunctie en bevestig de deployment. Er is geen build nodig.
-6. Open het gegeven **HTTPS-adres**. Bij Access moet je eerst kunnen inloggen. Controleer in een privévenster dat onbevoegde bezoekers de app niet te zien krijgen wanneer je bescherming hebt ingesteld.
-7. Controleer de vijf tegels, pas een link aan en herlaad de pagina om de opslag te controleren.
-
-Dit is een handmatige publicatiestap door jou. Bij openbare hosting zijn de websitebestanden zichtbaar, maar je GitHub-repository blijft privé. Publiceer daarom alleen de genoemde bestanden. Met toegangsbeveiliging kan eerder geladen inhoud nog lokaal/offline beschikbaar blijven op een toegelaten apparaat; uitloggen wist die lokale cache niet automatisch.
-
-### 4. Open en installeer op iPhone
-
-1. Open het HTTPS-adres in **Safari**; log zo nodig in.
-2. Tik op **Deel** (vierkant met pijl omhoog; eventueel in het menu).
-3. Kies **Zet op beginscherm** en schakel **Open als webapp** in als die optie verschijnt.
-4. Tik op **Voeg toe**. Het icoon heet **Mijn apps**.
-5. Open via het icoon en stel je app-links in. Een nieuwe webapp-installatie kan een eigen opslag hebben: controleer je links in de geïnstalleerde app.
-
-### 5. Open en installeer op Android
-
-1. Open hetzelfde HTTPS-adres in **Chrome**; log zo nodig in.
-2. Tik op **Installeer app** in de apphub als die knop verschijnt, of gebruik **⋮ → App installeren / Toevoegen aan startscherm**.
-3. Bevestig en open **Mijn apps** via het nieuwe icoon.
-4. Stel links in en controleer dat ze na opnieuw openen behouden blijven.
-
-De installatieopties hangen af van OS/browser-versie en toegangsbeveiliging. Als een beveiligde site niet als volledige PWA aangeboden wordt, gebruik de beginschermsnelkoppeling. In-app browsers van bijvoorbeeld WhatsApp ondersteunen installatie vaak niet: open het adres in Safari of Chrome.
+Open daarna via het icoon. Een webapp-installatie kan eigen opslag hebben; controleer je instellingen of herstel je back-up. Installatieopties hangen af van OS/browser-versie. Open de link in Safari of Chrome in plaats van een ingebouwde browser van bijvoorbeeld WhatsApp.
 
 ## Controleren
 
-`tests/smoke.cjs` gebruikt Playwright en Chromium. Die zijn in de huidige cloudomgeving beschikbaar:
+De bestaande cloudomgeving heeft Playwright en Chromium:
 
 ```sh
 node tests/smoke.cjs
 ```
 
-Op een andere ontwikkelmachine kun je Playwright buiten de repository installeren en `NODE_PATH` daarop instellen, en met `CHROMIUM_PATH` het Chromium-pad kiezen. De app zelf heeft deze testtools niet nodig. De test start en stopt een eigen lokale server en browser en gebruikt een geïsoleerd browserprofiel.
+Op een andere ontwikkelmachine kun je Playwright buiten de repository installeren, `NODE_PATH` daarop instellen en `CHROMIUM_PATH` naar Chromium laten wijzen. De website heeft deze testtools niet nodig. De test start en stopt zijn eigen server en browser en gebruikt geïsoleerde browserprofielen.
 
-Getest: standaardtegels en linkdoelen, toevoegen/wijzigen/verwijderen en annuleren, opslag na herladen, lege links, onveilige URL's, tekstinjectie, schermbreedtes 320/390/768/1280, aanraakknoppen, manifest/PNG-iconen, hosting onder een subpad, offline herladen en bewerken, kapotte/geblokkeerde opslag en browserfouten. Werkelijke installatie op iPhone/Android moet op de apparaten worden gecontroleerd; de cloudtest draait in Chromium en bewijst geen Safari-compatibiliteit op een echte iPhone.
+De browsercontrole test appbeheer, linkmigraties voor bestaande gebruikers, veilige links/tekst, opslag, favorieten, volgorde met pijlen/muis/touch, eigen symbolen en geüploade afbeeldingen, back-up/download/herstellen/annuleren en onveilige bestanden, werkcontext en ChatGPT-overdracht, updates en een oude service worker, offlinegebruik, manifest/PNG-iconen, subpadhosting en schermbreedtes 320/390/768/1280. De ChatGPT-bestemming wordt in de test nagebootst; die controle bewijst de overdracht van de vraag, niet de werking van het externe AI-model of inloggen. Werkelijke Safari/iPhone- en Android-installatie moet op de apparaten gecontroleerd worden.
 
-## Nieuwe versies
+## Ontwikkelen
 
-Upload bij een nieuwe versie dezelfde bestanden naar hetzelfde Pages-project. Verhoog bij wijzigingen aan offlinebestanden ook de `CACHE`-versie in `sw.js`. De nieuwe service worker wordt direct actief nadat alle appbestanden zijn gedownload. Bij een update verschijnt waar mogelijk een knop Vernieuwen; anders herlaad je de app met internet. Openstaande formulieren worden niet automatisch herladen. Lokaal opgeslagen app-links blijven behouden zolang het webadres en de opslagkey gelijk blijven. De offlinecache bevat alleen de apphubbestanden, geen gekoppelde apps.
+Verhoog bij nieuwe releases `VERSION` in `app.js` en de `CACHE`-versie in `sw.js`. De worker haalt de appbestanden opnieuw op, wordt direct actief na een succesvolle installatie en bewaart ze voor offlinegebruik. Bestaande appinstellingen blijven behouden zolang domein en opslagkey gelijk blijven. De cache bevat alleen de apphub, geen externe apps. Eigen iconen, favorieten en volgorde worden in de bestaande appopslag opgenomen, zodat oudere gebruikers hun links behouden.

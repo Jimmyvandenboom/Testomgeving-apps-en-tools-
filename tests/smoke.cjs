@@ -151,6 +151,114 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     assert.deepEqual(errors,[]);
     console.log('PASS: default apps, working link targets, edit/add/remove/cancel, persistence, empty links, unsafe URL rejection, safe text, responsive layouts, touch targets, manifest/icons, subpath hosting, offline reload/edit, corrupt/blocked storage, no browser errors.');
     await context.close();
+    const featureContext = await browser.newContext({viewport:{width:1280,height:1200},acceptDownloads:true,hasTouch:true});
+    const featurePage = await featureContext.newPage();
+    const featureErrors = []; featurePage.on('pageerror',error=>featureErrors.push(error.message));
+    await featurePage.goto(url);
+    await featurePage.evaluate(()=>navigator.serviceWorker.ready);
+    await featurePage.waitForFunction(()=>!!navigator.serviceWorker.controller);
+    const names = () => featurePage.locator('.card h2').allTextContents();
+    await featurePage.getByRole('button',{name:'GitHub favoriet',exact:true}).click();
+    assert.equal((await names())[0],'GitHub');
+    await featurePage.reload();
+    assert.equal((await names())[0],'GitHub');
+    await featurePage.getByRole('button',{name:'Volgorde wijzigen',exact:true}).click();
+    await featurePage.getByRole('button',{name:'AK MASTER eerder',exact:true}).click();
+    assert.deepEqual(await names(),['GitHub','AK MASTER','Expeditie IJsland','D&P beoordelen','ChatGPT']);
+    const handle = await featurePage.getByRole('button',{name:'Expeditie IJsland verslepen',exact:true}).boundingBox();
+    const target = await featurePage.locator('.card').filter({has:featurePage.getByRole('heading',{name:'ChatGPT',exact:true})}).boundingBox();
+    await featurePage.mouse.move(handle.x+handle.width/2,handle.y+handle.height/2);
+    await featurePage.mouse.down();
+    await featurePage.mouse.move(target.x+target.width/2,target.y+target.height*.7,{steps:15});
+    await featurePage.mouse.up();
+    assert.deepEqual(await names(),['GitHub','AK MASTER','D&P beoordelen','ChatGPT','Expeditie IJsland']);
+    await featurePage.reload();
+    assert.deepEqual(await names(),['GitHub','AK MASTER','D&P beoordelen','ChatGPT','Expeditie IJsland']);
+    await featurePage.getByRole('button',{name:'Link voor AK MASTER wijzigen',exact:true}).click();
+    await featurePage.locator('#app-icon').selectOption('book');
+    await featurePage.getByRole('button',{name:'Opslaan',exact:true}).click();
+    assert.equal(await featurePage.evaluate(()=>JSON.parse(localStorage.getItem('jimmy-apphub-v1')).find(app=>app.id==='ak').icon),'book');
+    await featurePage.getByRole('button',{name:'Link voor GitHub wijzigen',exact:true}).click();
+    await featurePage.locator('#icon-file').setInputFiles(path.join(root,'icons/icon-192.png'));
+    await featurePage.locator('#image-controls').waitFor({state:'visible'});
+    await featurePage.getByRole('button',{name:'Opslaan',exact:true}).click();
+    assert.equal(await featurePage.locator('.card').first().locator('img').count(),1);
+    await featurePage.reload();
+    assert.equal(await featurePage.locator('.card').first().locator('img').count(),1);
+    assert.equal(await featurePage.getByRole('button',{name:'GitHub favoriet',exact:true}).getAttribute('aria-pressed'),'true');
+    await featurePage.getByRole('button',{name:'Werkassistent',exact:true}).click();
+    await featurePage.locator('#work-context').fill('Jimmy geeft aardrijkskunde. Project: Expeditie IJsland.');
+    await featurePage.getByRole('button',{name:'Werkcontext bewaren',exact:true}).click();
+    assert.match(await featurePage.locator('#assistant-status').textContent(),/bewaard/);
+    await featurePage.locator('#assistant-question').fill('Help mij een les over vulkanen voorbereiden.');
+    await featureContext.route('https://chatgpt.com/**', route=>route.fulfill({status:200,body:'ChatGPT test destination'}));
+    const popupPromise = featureContext.waitForEvent('page');
+    await featurePage.getByRole('button',{name:'Bespreek in ChatGPT',exact:true}).click();
+    const popup = await popupPromise; await popup.waitForLoadState();
+    const prompt = new URL(popup.url()).searchParams.get('q');
+    assert.match(prompt,/Jimmy geeft aardrijkskunde/); assert.match(prompt,/vulkanen/); assert.match(prompt,/AK MASTER/);
+    assert.equal(await popup.evaluate(()=>window.opener),null);
+    await popup.close();
+    await featurePage.getByRole('button',{name:'Sluiten',exact:true}).click();
+    const downloadPromise = featurePage.waitForEvent('download');
+    await featurePage.getByRole('button',{name:'Back-up downloaden',exact:true}).click();
+    const download = await downloadPromise;
+    const backup = JSON.parse(await fs.readFile(await download.path(),'utf8'));
+    assert.equal(backup.format,'jimmy-apphub'); assert.equal(backup.apps.length,5);
+    assert.equal(backup.apps.find(app=>app.id==='github').favorite,true);
+    assert.match(backup.apps.find(app=>app.id==='github').image,/^data:image\/png/);
+    assert.match(backup.workContext,/aardrijkskunde/);
+    const exported = JSON.stringify(backup);
+    await featurePage.locator('#backup-file').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:Buffer.from(exported)});
+    await featurePage.getByRole('button',{name:'Annuleren',exact:true}).last().click();
+    assert.equal(await featurePage.locator('.card').count(),5);
+    for(const invalid of [
+      {...backup,apps:[{id:'bad',name:'Bad',url:'javascript:alert(1)'}]},
+      {...backup,apps:[backup.apps[0],backup.apps[0]]},
+      {...backup,apps:[{id:'bad',name:'Bad',url:'',image:'data:image/svg+xml;base64,PHN2Zz4='}]}
+    ]) {
+      await featurePage.locator('#backup-file').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(invalid))});
+      await featurePage.waitForFunction(()=>document.getElementById('status').textContent.startsWith('Herstellen lukt niet'));
+      assert.match(await featurePage.locator('#status').textContent(),/Herstellen lukt niet/);
+      assert.equal(await featurePage.locator('.card').count(),5);
+    }
+    // Restore exactly the exported favorites, custom icons, context and ordering.
+    await featurePage.getByRole('button',{name:'GitHub favoriet',exact:true}).click();
+    await featurePage.locator('#backup-file').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:Buffer.from(exported)});
+    await featurePage.getByRole('button',{name:'Herstellen',exact:true}).click();
+    assert.equal((await names())[0],'GitHub');
+    await featurePage.reload();
+    assert.equal((await names())[0],'GitHub');
+    assert.equal(await featurePage.locator('.card').first().locator('img').count(),1);
+    await featurePage.getByRole('button',{name:'Controleer op updates',exact:true}).click();
+    await featurePage.waitForFunction(()=>!document.getElementById('check-update').disabled);
+    assert.match(await featurePage.locator('#update-status').textContent(),/Geen nieuwe versie/);
+    await featureContext.setOffline(true);
+    await featurePage.getByRole('button',{name:'Controleer op updates',exact:true}).click();
+    assert.match(await featurePage.locator('#update-status').textContent(),/Verbind met internet/);
+    await featureContext.setOffline(false);
+    for (const width of [320,390,768,1280]) {
+      await featurePage.setViewportSize({width,height:900});
+      assert(await featurePage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`feature overflow at ${width}`);
+    }
+    await featurePage.setViewportSize({width:390,height:2400});
+    await featurePage.getByRole('button',{name:'Volgorde wijzigen',exact:true}).click();
+    const touchHandle = await featurePage.getByRole('button',{name:'AK MASTER verslepen',exact:true}).boundingBox();
+    const touchTarget = await featurePage.locator('.card').filter({has:featurePage.getByRole('heading',{name:'D&P beoordelen',exact:true})}).boundingBox();
+    const cdp = await featureContext.newCDPSession(featurePage);
+    const startTouch = {x:touchHandle.x+touchHandle.width/2,y:touchHandle.y+touchHandle.height/2};
+    const endTouch = {x:touchTarget.x+touchTarget.width/2,y:touchTarget.y+touchTarget.height*.7};
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[startTouch]});
+    for (let step=1;step<=8;step++) await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:startTouch.x+(endTouch.x-startTouch.x)*step/8,y:startTouch.y+(endTouch.y-startTouch.y)*step/8}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    assert.deepEqual(await names(),['GitHub','D&P beoordelen','AK MASTER','ChatGPT','Expeditie IJsland']);
+    await cdp.detach();
+    await featurePage.getByRole('button',{name:'Volgorde klaar',exact:true}).click();
+    await featurePage.setViewportSize({width:390,height:844});
+    await featurePage.screenshot({path:'/tmp/jimmy-apphub-features.png',fullPage:true});
+    assert.deepEqual(featureErrors,[]);
+    await featureContext.close();
+    console.log('PASS: favorites, persistent order, pointer dragging, arrow controls, custom icons/images, context and ChatGPT handoff, backup/export/restore/cancel, unsafe imports, update check, mobile layouts.');
     // An already active old worker must upgrade without closing every tab.
     legacyDeployment = true;
     const upgradeContext = await browser.newContext();
