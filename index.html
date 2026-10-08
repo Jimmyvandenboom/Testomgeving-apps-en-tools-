@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101e38">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mijn apps">
+  <meta name="description" content="Jimmy's persoonlijke startpunt voor apps en tools.">
+  <title>Mijn apps · Jimmy</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand" aria-hidden="true">J<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 18 18 6M6 6h12v12"/></svg></div>
+      <p class="eyebrow">JIMMY’S APPHUB</p>
+      <h1>Mijn apps<span class="dot">.</span></h1>
+      <p class="intro">Je apps en tools. Eén plek, altijd bij de hand.</p>
+      <div class="toolbar">
+        <button id="add-app" class="primary">＋ App toevoegen</button>
+        <button id="install-app" hidden>Installeer app</button>
+      </div>
+    </header>
+    <section aria-label="Apps en tools" id="apps" class="grid"></section>
+    <p id="status" role="status" class="status"></p>
+    <aside class="install-tip">
+      <svg class="tip-icon" aria-hidden="true" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18 18 6M6 6h12v12"/></svg>
+      <div><h2>Ook op je beginscherm</h2><p id="install-help">iPhone: open in Safari, tik op Deel en kies ‘Zet op beginscherm’. Android: open in Chrome en kies ‘App installeren’ of ‘Toevoegen aan startscherm’ in het menu.</p></div>
+    </aside>
+    <footer>Gemaakt voor Jimmy <span>•</span> Wijzigingen blijven op dit apparaat</footer>
+  </main>
+  <dialog id="editor" aria-labelledby="editor-title">
+    <form id="app-form">
+      <h2 id="editor-title">App toevoegen</h2>
+      <label for="app-name">Naam</label>
+      <input id="app-name" name="name" required maxlength="80" autocomplete="off">
+      <label for="app-url">Link <span class="optional">(mag leeg blijven)</span></label>
+      <input id="app-url" name="url" type="url" placeholder="https://…" inputmode="url" autocapitalize="none" autocomplete="off">
+      <p class="hint">Gebruik een volledige http- of https-link.</p>
+      <p id="form-error" class="error" role="alert"></p>
+      <div class="dialog-actions"><button type="button" id="cancel-editor">Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
+    </form>
+  </dialog>
+  <dialog id="remover" aria-labelledby="remove-title">
+    <h2 id="remove-title">App verwijderen?</h2>
+    <p id="remove-message"></p>
+    <div class="dialog-actions"><button id="cancel-remove">Annuleren</button><button id="confirm-remove" class="danger">Verwijderen</button></div>
+  </dialog>
+</body>
+</html>
