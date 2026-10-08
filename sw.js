@@ -1,5 +1,5 @@
 'use strict';
-const CACHE = 'jimmy-apphub-v2';
+const CACHE = 'jimmy-apphub-v3';
 const ASSETS = ['./', './index.html', './style.css', './app.js', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS))); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('jimmy-apphub-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())); });

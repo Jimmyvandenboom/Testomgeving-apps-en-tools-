@@ -1,6 +1,6 @@
 # Mijn apps · Jimmy
 
-Een mobiele persoonlijke apphub, zonder framework, accounts, analytics of externe dependencies. De standaardtegels zijn Expeditie IJsland, AK MASTER, D&P beoordelen, ChatGPT en GitHub. De eerste drie hebben bewust geen link.
+Een mobiele persoonlijke apphub, zonder framework, accounts, analytics of externe dependencies. De standaardtegels zijn Expeditie IJsland, AK MASTER, D&P beoordelen, ChatGPT en GitHub. Expeditie IJsland verwijst naar de IJsland-app. AK MASTER en D&P beoordelen hebben nog geen link.
 
 ## Gebruik
 

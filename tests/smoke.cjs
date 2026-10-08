@@ -28,10 +28,11 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await page.goto(url);
     assert.equal(await page.locator('.card').count(),5);
     assert.equal(await page.locator('.card').filter({hasText:'ChatGPT'}).locator('a').getAttribute('href'),'https://chatgpt.com/');
-    assert.equal(await page.locator('.card').filter({hasText:'GitHub'}).locator('a').getAttribute('href'),'https://github.com/');
-    assert.equal(await page.getByRole('button',{name:'Link instellen',exact:true}).count(),3);
+    assert.equal(await page.getByRole('link',{name:'GitHub openen',exact:true}).getAttribute('href'),'https://github.com/');
+    assert.equal(await page.getByRole('button',{name:'Link instellen',exact:true}).count(),2);
     const iceland = page.locator('.card').filter({hasText:'Expeditie IJsland'});
-    await iceland.getByRole('button',{name:'Link instellen',exact:true}).click();
+    assert.equal(await iceland.locator('a').getAttribute('href'),'https://jimmyvandenboom.github.io/Expeditie-ijsland-2027-/');
+    await iceland.getByRole('button',{name:/Link voor/}).click();
     await page.locator('#app-url').fill('https://example.com/iceland');
     await page.getByRole('button',{name:'Opslaan',exact:true}).click();
     assert.equal(await iceland.locator('a').getAttribute('href'),'https://example.com/iceland');
@@ -57,6 +58,8 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await page.locator('#app-url').fill('');
     await page.getByRole('button',{name:'Opslaan',exact:true}).click();
     assert.equal(await iceland.locator('a').count(),0);
+    await page.reload();
+    assert.equal(await iceland.locator('a').count(),0); // Intentional clearing survives reload.
     for (const width of [320,390,768,1280]) {
       await page.setViewportSize({width,height:844});
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow at ${width}`);
@@ -80,6 +83,30 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await page.reload();
     assert.equal(await page.locator('.card').count(),6);
     await context.setOffline(false);
+    // Upgrade an existing user's empty tile without replacing their other tiles.
+    await page.evaluate(() => {
+      localStorage.removeItem('jimmy-iceland-link-v1');
+      localStorage.setItem('jimmy-apphub-v1', JSON.stringify([
+        {id:'iceland',name:'Mijn IJsland',url:''},
+        {id:'custom',name:'Mijn tool',url:'https://example.com/tool'}
+      ]));
+    });
+    await page.reload();
+    assert.equal(await page.locator('.card').count(),2);
+    assert.equal(await page.locator('.card').first().locator('a').getAttribute('href'),'https://jimmyvandenboom.github.io/Expeditie-ijsland-2027-/');
+    assert.equal(await page.locator('.card').first().locator('h2').textContent(),'Mijn IJsland');
+    for (const storedApps of [
+      [{id:'iceland',name:'Custom IJsland',url:'https://example.com/custom'}],
+      []
+    ]) {
+      await page.evaluate(apps => {
+        localStorage.removeItem('jimmy-iceland-link-v1');
+        localStorage.setItem('jimmy-apphub-v1',JSON.stringify(apps));
+      },storedApps);
+      await page.reload();
+      assert.equal(await page.locator('.card').count(),storedApps.length);
+      if (storedApps.length) assert.equal(await page.locator('.card a').getAttribute('href'),storedApps[0].url);
+    }
     await page.evaluate(()=>localStorage.setItem('jimmy-apphub-v1','broken json'));
     await page.reload();
     assert.equal(await page.locator('.card').count(),5);
