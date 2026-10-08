@@ -118,9 +118,22 @@ textarea { resize: vertical; line-height: 1.6; }
 
 .photo-header { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); align-items: center; gap: 32px; }
 .hero-content { min-width: 0; }
-.hero-photo { display: block; width: 100%; height: auto; border-radius: 18px; border: 1px solid #ffffff33; }
+.hero-photo {
+  display: block;
+  width: 84%;
+  max-width: 300px;
+  height: auto;
+  justify-self: center;
+  margin: 10px 0;
+  border: 10px solid white;
+  border-bottom-width: 26px;
+  border-radius: 4px;
+  background: white;
+  transform: rotate(-5deg);
+  box-shadow: 0 12px 28px #03142666, 0 2px 5px #03142633;
+}
 @media(max-width:760px) {
   .photo-header { grid-template-columns: 1fr; gap: 24px; }
-  .hero-photo { grid-row: 1; max-width: 420px; justify-self: center; }
+  .hero-photo { grid-row: 1; max-width: 230px; }
   .photo-header .brand { display: none; }
 }
