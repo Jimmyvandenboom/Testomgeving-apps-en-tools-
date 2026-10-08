@@ -1,14 +1,15 @@
 'use strict';
-const VERSION = '1.3.0';
+const VERSION = '1.3.1';
 const STORAGE_KEY = 'jimmy-apphub-v1';
 const CONTEXT_KEY = 'jimmy-work-context-v1';
-const LINK_MARKERS = ['jimmy-iceland-link-v1', 'jimmy-ak-link-v1'];
+const LINK_MARKERS = ['jimmy-iceland-link-v1', 'jimmy-ak-link-v1', 'jimmy-vabok-added-v1'];
 const defaults = [
   { id: 'iceland', name: 'Expeditie IJsland', url: 'https://jimmyvandenboom.github.io/Expeditie-ijsland-2027-/' },
   { id: 'ak', name: 'AK MASTER', url: 'https://jimmyvandenboom.github.io/AK-MASTER-app-/' },
   { id: 'dp', name: 'D&P beoordelen', url: '' },
   { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/' },
-  { id: 'github', name: 'GitHub', url: 'https://github.com/' }
+  { id: 'github', name: 'GitHub', url: 'https://github.com/' },
+  { id: 'vabok', name: 'VABOK-project', url: 'https://jimmyvandenboom.github.io/VABOK-project-/' }
 ];
 const ICONS = {
   mountain: 'M3 27 13 8l7 12 5-8 10 15H3Zm6-11 4-8 5 8-5-2-4 2Z',
@@ -22,7 +23,7 @@ const ICONS = {
   star: 'm19 3 5 10 11 2-8 8 2 12-10-6-10 6 2-12-8-8 11-2 5-10Z',
   grip: 'M12 8h1m12 0h1M12 19h1m12 0h1M12 30h1m12 0h1'
 };
-const DEFAULT_ICONS = { iceland: 'mountain', ak: 'globe', dp: 'check', chatgpt: 'chat', github: 'code' };
+const DEFAULT_ICONS = { iceland: 'mountain', ak: 'globe', dp: 'check', chatgpt: 'chat', github: 'code', vabok: 'book' };
 const $ = id => document.getElementById(id);
 function safeUrl(value) {
   if (typeof value !== 'string') return '';
@@ -55,6 +56,16 @@ try {
     const app = apps.find(app => app.id === id);
     if (app && !app.url) { app.url = defaults.find(app => app.id === id).url; localStorage.setItem(STORAGE_KEY, JSON.stringify(apps)); }
     localStorage.setItem(marker, 'done');
+  }
+  // Add the new project once, without replacing custom apps or resurrecting deletions.
+  if (localStorage.getItem(LINK_MARKERS[2]) !== 'done') {
+    const project = defaults.find(app => app.id === 'vabok');
+    const exists = apps.some(app => app.id === project.id || app.url === project.url);
+    if (!exists && apps.length < 200) {
+      apps = [...apps, ...normalizeApps([project])];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
+    }
+    if (exists || apps.some(app => app.id === project.id)) localStorage.setItem(LINK_MARKERS[2], 'done');
   }
   workContext = (localStorage.getItem(CONTEXT_KEY) || '').slice(0, 10000);
 } catch { $('status').textContent = 'Je opgeslagen apps konden niet worden geladen. De standaardapps worden getoond.'; }

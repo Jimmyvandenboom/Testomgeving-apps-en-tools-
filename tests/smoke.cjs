@@ -34,11 +34,12 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     const page = await context.newPage();
     const errors=[]; page.on('pageerror',error=>errors.push(error.message));
     await page.goto(url);
-    assert.equal(await page.locator('.card').count(),5);
+    assert.equal(await page.locator('.card').count(),6);
     assert.equal(await page.locator('.card').filter({hasText:'ChatGPT'}).locator('a').getAttribute('href'),'https://chatgpt.com/');
     assert.equal(await page.getByRole('link',{name:'GitHub openen',exact:true}).getAttribute('href'),'https://github.com/');
     assert.equal(await page.getByRole('button',{name:'Link instellen',exact:true}).count(),1);
     assert.equal(await page.getByRole('link',{name:'AK MASTER openen',exact:true}).getAttribute('href'),'https://jimmyvandenboom.github.io/AK-MASTER-app-/');
+    assert.equal(await page.getByRole('link',{name:'VABOK-project openen',exact:true}).getAttribute('href'),'https://jimmyvandenboom.github.io/VABOK-project-/');
     const iceland = page.locator('.card').filter({hasText:'Expeditie IJsland'});
     assert.equal(await iceland.locator('a').getAttribute('href'),'https://jimmyvandenboom.github.io/Expeditie-ijsland-2027-/');
     await iceland.getByRole('button',{name:/Link voor/}).click();
@@ -51,18 +52,18 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await page.locator('#app-name').fill('<img src=x onerror=alert(1)>');
     await page.locator('#app-url').fill('javascript:alert(1)');
     await page.getByRole('button',{name:'Opslaan',exact:true}).click();
-    assert.equal(await page.locator('.card').count(),5);
+    assert.equal(await page.locator('.card').count(),6);
     await page.locator('#app-url').fill('');
     await page.getByRole('button',{name:'Opslaan',exact:true}).click();
-    assert.equal(await page.locator('.card').count(),6);
+    assert.equal(await page.locator('.card').count(),7);
     assert.equal(await page.locator('.card img').count(),0);
     const added = page.locator('.card').last();
     await added.getByRole('button',{name:/verwijderen/}).click();
     await page.getByRole('button',{name:'Annuleren',exact:true}).last().click();
-    assert.equal(await page.locator('.card').count(),6);
+    assert.equal(await page.locator('.card').count(),7);
     await added.getByRole('button',{name:/verwijderen/}).click();
     await page.getByRole('button',{name:'Verwijderen',exact:true}).click();
-    assert.equal(await page.locator('.card').count(),5);
+    assert.equal(await page.locator('.card').count(),6);
     await iceland.getByRole('button',{name:/Link voor/}).click();
     await page.locator('#app-url').fill('');
     await page.getByRole('button',{name:'Opslaan',exact:true}).click();
@@ -85,12 +86,12 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
     await context.setOffline(true);
     await page.reload();
-    assert.equal(await page.locator('.card').count(),5);
+    assert.equal(await page.locator('.card').count(),6);
     await page.getByRole('button',{name:'App toevoegen'}).click();
     await page.locator('#app-name').fill('Offline app');
     await page.getByRole('button',{name:'Opslaan',exact:true}).click();
     await page.reload();
-    assert.equal(await page.locator('.card').count(),6);
+    assert.equal(await page.locator('.card').count(),7);
     await context.setOffline(false);
     // AK migration fills old blanks, preserves custom links/deletions, and only runs once.
     for (const [saved, expected] of [
@@ -135,15 +136,33 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
       assert.equal(await page.locator('.card').count(),storedApps.length);
       if (storedApps.length) assert.equal(await page.locator('.card a').getAttribute('href'),storedApps[0].url);
     }
+    // A new release adds VABOK once while preserving the user's custom settings.
+    for (const [saved, expectedCount] of [
+      [[{id:'custom',name:'Mijn tool',url:'https://example.com/tool',favorite:true,icon:'tool'}],2],
+      [[{id:'own-project',name:'Mijn VABOK',url:'https://jimmyvandenboom.github.io/VABOK-project-/'}],1]
+    ]) {
+      await page.evaluate(apps => {
+        localStorage.removeItem('jimmy-vabok-added-v1');
+        localStorage.setItem('jimmy-apphub-v1',JSON.stringify(apps));
+      },saved);
+      await page.reload();
+      assert.equal(await page.locator('.card').count(),expectedCount);
+      assert.equal(await page.locator('.card h2').first().textContent(),saved[0].name);
+      await page.reload();
+      assert.equal(await page.locator('.card').count(),expectedCount);
+    }
+    await page.evaluate(()=>localStorage.setItem('jimmy-apphub-v1','[]'));
+    await page.reload();
+    assert.equal(await page.locator('.card').count(),0); // Deleted tiles stay deleted.
     await page.evaluate(()=>localStorage.setItem('jimmy-apphub-v1','broken json'));
     await page.reload();
-    assert.equal(await page.locator('.card').count(),5);
+    assert.equal(await page.locator('.card').count(),6);
     assert.match(await page.locator('#status').textContent(),/niet worden geladen/);
     await page.evaluate(()=>{Storage.prototype.setItem=()=>{throw new DOMException('Denied','SecurityError')};});
     await page.getByRole('button',{name:'App toevoegen'}).click();
     await page.locator('#app-name').fill('Cannot save');
     await page.getByRole('button',{name:'Opslaan',exact:true}).click();
-    assert.equal(await page.locator('.card').count(),5);
+    assert.equal(await page.locator('.card').count(),6);
     assert.match(await page.locator('#form-error').textContent(),/niet worden opgeslagen/);
     await page.getByRole('button',{name:'Annuleren',exact:true}).first().click();
     await page.setViewportSize({width:390,height:844});
@@ -164,16 +183,16 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     assert.equal((await names())[0],'GitHub');
     await featurePage.getByRole('button',{name:'Volgorde wijzigen',exact:true}).click();
     await featurePage.getByRole('button',{name:'AK MASTER eerder',exact:true}).click();
-    assert.deepEqual(await names(),['GitHub','AK MASTER','Expeditie IJsland','D&P beoordelen','ChatGPT']);
+    assert.deepEqual(await names(),['GitHub','AK MASTER','Expeditie IJsland','D&P beoordelen','ChatGPT','VABOK-project']);
     const handle = await featurePage.getByRole('button',{name:'Expeditie IJsland verslepen',exact:true}).boundingBox();
     const target = await featurePage.locator('.card').filter({has:featurePage.getByRole('heading',{name:'ChatGPT',exact:true})}).boundingBox();
     await featurePage.mouse.move(handle.x+handle.width/2,handle.y+handle.height/2);
     await featurePage.mouse.down();
     await featurePage.mouse.move(target.x+target.width/2,target.y+target.height*.7,{steps:15});
     await featurePage.mouse.up();
-    assert.deepEqual(await names(),['GitHub','AK MASTER','D&P beoordelen','ChatGPT','Expeditie IJsland']);
+    assert.deepEqual(await names(),['GitHub','AK MASTER','D&P beoordelen','ChatGPT','Expeditie IJsland','VABOK-project']);
     await featurePage.reload();
-    assert.deepEqual(await names(),['GitHub','AK MASTER','D&P beoordelen','ChatGPT','Expeditie IJsland']);
+    assert.deepEqual(await names(),['GitHub','AK MASTER','D&P beoordelen','ChatGPT','Expeditie IJsland','VABOK-project']);
     await featurePage.getByRole('button',{name:'Link voor AK MASTER wijzigen',exact:true}).click();
     await featurePage.locator('#app-icon').selectOption('book');
     await featurePage.getByRole('button',{name:'Opslaan',exact:true}).click();
@@ -204,14 +223,14 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await featurePage.getByRole('button',{name:'Back-up downloaden',exact:true}).click();
     const download = await downloadPromise;
     const backup = JSON.parse(await fs.readFile(await download.path(),'utf8'));
-    assert.equal(backup.format,'jimmy-apphub'); assert.equal(backup.apps.length,5);
+    assert.equal(backup.format,'jimmy-apphub'); assert.equal(backup.apps.length,6);
     assert.equal(backup.apps.find(app=>app.id==='github').favorite,true);
     assert.match(backup.apps.find(app=>app.id==='github').image,/^data:image\/png/);
     assert.match(backup.workContext,/aardrijkskunde/);
     const exported = JSON.stringify(backup);
     await featurePage.locator('#backup-file').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:Buffer.from(exported)});
     await featurePage.getByRole('button',{name:'Annuleren',exact:true}).last().click();
-    assert.equal(await featurePage.locator('.card').count(),5);
+    assert.equal(await featurePage.locator('.card').count(),6);
     for(const invalid of [
       {...backup,apps:[{id:'bad',name:'Bad',url:'javascript:alert(1)'}]},
       {...backup,apps:[backup.apps[0],backup.apps[0]]},
@@ -220,7 +239,7 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
       await featurePage.locator('#backup-file').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(invalid))});
       await featurePage.waitForFunction(()=>document.getElementById('status').textContent.startsWith('Herstellen lukt niet'));
       assert.match(await featurePage.locator('#status').textContent(),/Herstellen lukt niet/);
-      assert.equal(await featurePage.locator('.card').count(),5);
+      assert.equal(await featurePage.locator('.card').count(),6);
     }
     // Restore exactly the exported favorites, custom icons, context and ordering.
     await featurePage.getByRole('button',{name:'GitHub favoriet',exact:true}).click();
@@ -251,7 +270,7 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[startTouch]});
     for (let step=1;step<=8;step++) await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:startTouch.x+(endTouch.x-startTouch.x)*step/8,y:startTouch.y+(endTouch.y-startTouch.y)*step/8}]});
     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-    assert.deepEqual(await names(),['GitHub','D&P beoordelen','AK MASTER','ChatGPT','Expeditie IJsland']);
+    assert.deepEqual(await names(),['GitHub','D&P beoordelen','AK MASTER','ChatGPT','Expeditie IJsland','VABOK-project']);
     await cdp.detach();
     await featurePage.getByRole('button',{name:'Volgorde klaar',exact:true}).click();
     await featurePage.setViewportSize({width:390,height:844});

@@ -1,10 +1,10 @@
 # Mijn apps · Jimmy
 
-Een mobiele persoonlijke apphub zonder framework, analytics of installatie van dependencies. De standaardtegels zijn Expeditie IJsland, AK MASTER, D&P beoordelen, ChatGPT en GitHub. IJsland en AK MASTER hebben hun links; D&P blijft leeg tot zijn link bekend is.
+Een mobiele persoonlijke apphub zonder framework, analytics of installatie van dependencies. De standaardtegels zijn Expeditie IJsland, AK MASTER, D&P beoordelen, ChatGPT, GitHub en VABOK-project. IJsland en AK MASTER hebben hun links; D&P blijft leeg tot zijn link bekend is.
 
 Apphub: https://jimmyvandenboom.github.io/Testomgeving-apps-en-tools-/
 
-## Gebruik — versie 1.3.0
+## Gebruik — versie 1.3.1
 
 - **Openen** opent de gekoppelde app. **Link instellen / Link wijzigen** past naam, link en icoon aan. Een lege link is toegestaan. Schooltools, lesmateriaal en roosters kun je zelf toevoegen via **App toevoegen**.
 - De **ster** maakt een app favoriet; favorieten staan altijd bovenaan. De **×** verwijdert een tegel na bevestiging.
