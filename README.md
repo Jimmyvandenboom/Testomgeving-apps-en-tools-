@@ -4,9 +4,9 @@ Een mobiele persoonlijke apphub zonder framework, analytics of installatie van d
 
 Apphub: https://jimmyvandenboom.github.io/Testomgeving-apps-en-tools-/
 
-## Gebruik — versie 1.4.0
+## Gebruik — versie 1.4.1
 
-De interface heeft een donkerblauwe kop, witte tegels en blauwe actieknoppen. De tien icoontjes staan als aanraakbare knoppen in het venster App wijzigen; je ziet meteen welke gekozen is.
+De startpagina toont de persoonlijke foto uit `jimmy.png`; deze is ook offline beschikbaar. De interface heeft een donkerblauwe kop, witte tegels en blauwe actieknoppen. De tien icoontjes staan als aanraakbare knoppen in het venster App wijzigen; je ziet meteen welke gekozen is.
 
 - **Openen** opent de gekoppelde app. **Link instellen / Link wijzigen** past naam, link en icoon aan. Een lege link is toegestaan. Schooltools, lesmateriaal en roosters kun je zelf toevoegen via **App toevoegen**.
 - De **ster** maakt een app favoriet; favorieten staan altijd bovenaan. De **×** verwijdert een tegel na bevestiging.

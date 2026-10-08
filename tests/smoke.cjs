@@ -34,6 +34,8 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     const page = await context.newPage();
     const errors=[]; page.on('pageerror',error=>errors.push(error.message));
     await page.goto(url);
+    await page.locator('.hero-photo').waitFor({state:'visible'});
+    await page.waitForFunction(()=>{const photo=document.querySelector('.hero-photo');return photo.complete && photo.naturalWidth===1289;});
     assert.equal(await page.locator('.card').count(),6);
     assert.equal(await page.locator('.card').filter({hasText:'ChatGPT'}).locator('a').getAttribute('href'),'https://chatgpt.com/');
     assert.equal(await page.getByRole('link',{name:'GitHub openen',exact:true}).getAttribute('href'),'https://github.com/');
@@ -86,6 +88,7 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
     await context.setOffline(true);
     await page.reload();
+    await page.waitForFunction(()=>{const photo=document.querySelector('.hero-photo');return photo.complete && photo.naturalWidth===1289;});
     assert.equal(await page.locator('.card').count(),6);
     await page.getByRole('button',{name:'App toevoegen'}).click();
     await page.locator('#app-name').fill('Offline app');
@@ -170,7 +173,7 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     assert.deepEqual(errors,[]);
     console.log('PASS: default apps, working link targets, edit/add/remove/cancel, persistence, empty links, unsafe URL rejection, safe text, responsive layouts, touch targets, manifest/icons, subpath hosting, offline reload/edit, corrupt/blocked storage, no browser errors.');
     await context.close();
-    const featureContext = await browser.newContext({viewport:{width:1280,height:1200},acceptDownloads:true,hasTouch:true});
+    const featureContext = await browser.newContext({viewport:{width:1280,height:1800},acceptDownloads:true,hasTouch:true});
     const featurePage = await featureContext.newPage();
     const featureErrors = []; featurePage.on('pageerror',error=>featureErrors.push(error.message));
     await featurePage.goto(url);
@@ -208,7 +211,7 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await featurePage.setViewportSize({width:390,height:844});
     await featurePage.locator('#icon-options').scrollIntoViewIfNeeded();
     await featurePage.screenshot({path:'/tmp/jimmy-icon-picker.png'});
-    await featurePage.setViewportSize({width:1280,height:1200});
+    await featurePage.setViewportSize({width:1280,height:1800});
     assert.equal(await featurePage.getByRole('button',{name:'Boek',exact:true}).getAttribute('aria-pressed'),'true');
     await featurePage.getByRole('button',{name:'Opslaan',exact:true}).click();
     assert.equal(await featurePage.evaluate(()=>JSON.parse(localStorage.getItem('jimmy-apphub-v1')).find(app=>app.id==='ak').icon),'book');

@@ -115,3 +115,12 @@ textarea { resize: vertical; line-height: 1.6; }
 }
 @media(max-width:360px) { .icon-options { grid-template-columns: repeat(4,minmax(0,1fr)); } }
 @media(prefers-reduced-motion:no-preference) { button,.open { transition: background .15s,filter .15s; } }
+
+.photo-header { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); align-items: center; gap: 32px; }
+.hero-content { min-width: 0; }
+.hero-photo { display: block; width: 100%; height: auto; border-radius: 18px; border: 1px solid #ffffff33; }
+@media(max-width:760px) {
+  .photo-header { grid-template-columns: 1fr; gap: 24px; }
+  .hero-photo { grid-row: 1; max-width: 420px; justify-self: center; }
+  .photo-header .brand { display: none; }
+}

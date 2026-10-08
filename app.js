@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '1.4.0';
+const VERSION = '1.4.1';
 const STORAGE_KEY = 'jimmy-apphub-v1';
 const CONTEXT_KEY = 'jimmy-work-context-v1';
 const LINK_MARKERS = ['jimmy-iceland-link-v1', 'jimmy-ak-link-v1', 'jimmy-vabok-added-v1'];
