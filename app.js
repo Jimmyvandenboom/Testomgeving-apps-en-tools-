@@ -2,7 +2,7 @@
 const STORAGE_KEY = 'jimmy-apphub-v1';
 const defaults = [
   { id: 'iceland', name: 'Expeditie IJsland', url: 'https://jimmyvandenboom.github.io/Expeditie-ijsland-2027-/' },
-  { id: 'ak', name: 'AK MASTER', url: '' },
+  { id: 'ak', name: 'AK MASTER', url: 'https://jimmyvandenboom.github.io/AK-MASTER-app-/' },
   { id: 'dp', name: 'D&P beoordelen', url: '' },
   { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/' },
   { id: 'github', name: 'GitHub', url: 'https://github.com/' }
@@ -20,14 +20,18 @@ try {
     if (!Array.isArray(parsed) || !parsed.every(app => app && typeof app.id === 'string' && typeof app.name === 'string' && app.name.trim() && typeof app.url === 'string') || new Set(parsed.map(app => app.id)).size !== parsed.length) throw new Error('Invalid saved apps');
     apps = parsed.map(app => ({ id: app.id, name: app.name.slice(0, 80), url: safeUrl(app.url) }));
   }
-  // Fill the old empty default once; preserve custom links and removed tiles.
-  if (localStorage.getItem('jimmy-iceland-link-v1') !== 'done') {
-    const iceland = apps.find(app => app.id === 'iceland');
-    if (iceland && !iceland.url) {
-      iceland.url = defaults.find(app => app.id === 'iceland').url;
+  // Fill old empty defaults once; preserve custom links and removed tiles.
+  for (const [id, marker] of [
+    ['iceland', 'jimmy-iceland-link-v1'],
+    ['ak', 'jimmy-ak-link-v1']
+  ]) {
+    if (localStorage.getItem(marker) === 'done') continue;
+    const app = apps.find(app => app.id === id);
+    if (app && !app.url) {
+      app.url = defaults.find(app => app.id === id).url;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
     }
-    localStorage.setItem('jimmy-iceland-link-v1', 'done');
+    localStorage.setItem(marker, 'done');
   }
 } catch { $('status').textContent = 'Je opgeslagen apps konden niet worden geladen. De standaardapps worden getoond.'; }
 function persist(next) {

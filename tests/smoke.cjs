@@ -29,7 +29,8 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     assert.equal(await page.locator('.card').count(),5);
     assert.equal(await page.locator('.card').filter({hasText:'ChatGPT'}).locator('a').getAttribute('href'),'https://chatgpt.com/');
     assert.equal(await page.getByRole('link',{name:'GitHub openen',exact:true}).getAttribute('href'),'https://github.com/');
-    assert.equal(await page.getByRole('button',{name:'Link instellen',exact:true}).count(),2);
+    assert.equal(await page.getByRole('button',{name:'Link instellen',exact:true}).count(),1);
+    assert.equal(await page.getByRole('link',{name:'AK MASTER openen',exact:true}).getAttribute('href'),'https://jimmyvandenboom.github.io/AK-MASTER-app-/');
     const iceland = page.locator('.card').filter({hasText:'Expeditie IJsland'});
     assert.equal(await iceland.locator('a').getAttribute('href'),'https://jimmyvandenboom.github.io/Expeditie-ijsland-2027-/');
     await iceland.getByRole('button',{name:/Link voor/}).click();
@@ -83,6 +84,25 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await page.reload();
     assert.equal(await page.locator('.card').count(),6);
     await context.setOffline(false);
+    // AK migration fills old blanks, preserves custom links/deletions, and only runs once.
+    for (const [saved, expected] of [
+      [[{id:'ak',name:'Mijn AK',url:''}], 'https://jimmyvandenboom.github.io/AK-MASTER-app-/'],
+      [[{id:'ak',name:'Mijn AK',url:'https://example.com/ak'}], 'https://example.com/ak'],
+      [[], null]
+    ]) {
+      await page.evaluate(apps => {
+        localStorage.removeItem('jimmy-ak-link-v1');
+        localStorage.setItem('jimmy-apphub-v1',JSON.stringify(apps));
+      },saved);
+      await page.reload();
+      assert.equal(await page.locator('.card').count(),saved.length);
+      if (expected) assert.equal(await page.locator('.card a').getAttribute('href'),expected);
+    }
+    await page.evaluate(()=>{
+      localStorage.setItem('jimmy-apphub-v1',JSON.stringify([{id:'ak',name:'AK',url:''}]));
+    });
+    await page.reload();
+    assert.equal(await page.locator('.card a').count(),0);
     // Upgrade an existing user's empty tile without replacing their other tiles.
     await page.evaluate(() => {
       localStorage.removeItem('jimmy-iceland-link-v1');
