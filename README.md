@@ -91,4 +91,4 @@ Getest: standaardtegels en linkdoelen, toevoegen/wijzigen/verwijderen en annuler
 
 ## Nieuwe versies
 
-Upload bij een nieuwe versie dezelfde bestanden naar hetzelfde Pages-project. Verhoog bij wijzigingen aan offlinebestanden ook de `CACHE`-versie in `sw.js`. De service worker blijft tijdens gebruik van een oude versie wachten; sluit alle tabbladen en de geïnstalleerde app en open opnieuw met internet om de nieuwe versie te activeren. Lokaal opgeslagen app-links blijven behouden zolang het webadres en de opslagkey gelijk blijven. De offlinecache bevat alleen de apphubbestanden, geen gekoppelde apps.
+Upload bij een nieuwe versie dezelfde bestanden naar hetzelfde Pages-project. Verhoog bij wijzigingen aan offlinebestanden ook de `CACHE`-versie in `sw.js`. De nieuwe service worker wordt direct actief nadat alle appbestanden zijn gedownload. Bij een update verschijnt waar mogelijk een knop Vernieuwen; anders herlaad je de app met internet. Openstaande formulieren worden niet automatisch herladen. Lokaal opgeslagen app-links blijven behouden zolang het webadres en de opslagkey gelijk blijven. De offlinecache bevat alleen de apphubbestanden, geen gekoppelde apps.

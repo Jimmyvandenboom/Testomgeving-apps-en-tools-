@@ -7,13 +7,21 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.webmanifest':'application/manifest+json', '.png':'image/png', '.svg':'image/svg+xml' };
 (async () => {
+  let legacyDeployment = false;
   const server = http.createServer(async (req,res) => {
     try {
       const pathname = decodeURIComponent(new URL(req.url,'http://localhost').pathname);
       const relative = pathname.replace(/^\/hub\//,'');
       const filename = path.resolve(root,relative || 'index.html');
       if (!filename.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
-      const contents = await fs.readFile(filename);
+      let contents = await fs.readFile(filename);
+      if (legacyDeployment && relative === 'sw.js') contents = Buffer.from(`
+        const CACHE='jimmy-apphub-legacy-test';
+        self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./app.js','./style.css']))));
+        self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
+        self.addEventListener('fetch',e=>{if(new URL(e.request.url).origin===self.location.origin)e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request)));});
+      `);
+      if (legacyDeployment && relative === 'app.js') contents = Buffer.concat([Buffer.from('window.__legacyApp = true;\n'),contents]);
       res.writeHead(200,{'Content-Type':types[path.extname(filename)] || 'application/octet-stream'}).end(contents);
     } catch { res.writeHead(404).end(); }
   });
@@ -143,5 +151,30 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     assert.deepEqual(errors,[]);
     console.log('PASS: default apps, working link targets, edit/add/remove/cancel, persistence, empty links, unsafe URL rejection, safe text, responsive layouts, touch targets, manifest/icons, subpath hosting, offline reload/edit, corrupt/blocked storage, no browser errors.');
     await context.close();
+    // An already active old worker must upgrade without closing every tab.
+    legacyDeployment = true;
+    const upgradeContext = await browser.newContext();
+    const upgradePage = await upgradeContext.newPage();
+    await upgradePage.goto(url);
+    await upgradePage.evaluate(()=>navigator.serviceWorker.ready);
+    await upgradePage.waitForFunction(()=>!!navigator.serviceWorker.controller);
+    assert.equal(await upgradePage.evaluate(()=>window.__legacyApp),true);
+    await upgradePage.reload(); // Simulate reopening an already installed app.
+    legacyDeployment = false;
+    await upgradePage.evaluate(async()=>{
+      window.__workerChanged = false;
+      navigator.serviceWorker.addEventListener('controllerchange',()=>{window.__workerChanged=true;},{once:true});
+      await (await navigator.serviceWorker.getRegistration()).update();
+    });
+    await upgradePage.waitForFunction(()=>window.__workerChanged);
+    await upgradePage.getByRole('button',{name:'Vernieuwen',exact:true}).click();
+    assert.equal(await upgradePage.evaluate(()=>window.__legacyApp),undefined);
+    assert.equal(await upgradePage.getByRole('link',{name:'AK MASTER openen',exact:true}).getAttribute('href'),'https://jimmyvandenboom.github.io/AK-MASTER-app-/');
+    await upgradeContext.setOffline(true);
+    await upgradePage.reload();
+    assert.equal(await upgradePage.evaluate(()=>window.__legacyApp),undefined);
+    assert.equal(await upgradePage.getByRole('link',{name:'Expeditie IJsland openen',exact:true}).count(),1);
+    console.log('PASS: active legacy worker upgrades, refresh button loads new app, updated offline cache retains both app links.');
+    await upgradeContext.close();
   } finally { if(browser) await browser.close(); await new Promise(resolve=>server.close(resolve)); }
 })().catch(error=>{console.error(error);process.exitCode=1;});

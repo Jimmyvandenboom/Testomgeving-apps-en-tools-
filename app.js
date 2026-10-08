@@ -95,4 +95,16 @@ window.addEventListener('beforeinstallprompt', (event) => { event.preventDefault
 $('install-app').addEventListener('click', async () => { if (!installPrompt) return; await installPrompt.prompt(); installPrompt = null; $('install-app').hidden = true; });
 window.addEventListener('appinstalled', () => { $('install-app').hidden = true; $('install-help').textContent = 'Je apphub staat op je beginscherm.'; });
 render();
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => { $('status').textContent = 'Offlinegebruik is nu niet beschikbaar. De apphub blijft online bruikbaar.'; });
+if ('serviceWorker' in navigator) {
+  const wasControlled = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!wasControlled) return;
+    $('status').textContent = 'Een nieuwe versie is beschikbaar. ';
+    const refresh = element('button', 'primary', 'Vernieuwen');
+    refresh.addEventListener('click', () => location.reload());
+    $('status').append(refresh);
+  });
+  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(() => {
+    $('status').textContent = 'Offlinegebruik is nu niet beschikbaar. De apphub blijft online bruikbaar.';
+  });
+}
