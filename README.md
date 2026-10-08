@@ -4,12 +4,14 @@ Een mobiele persoonlijke apphub zonder framework, analytics of installatie van d
 
 Apphub: https://jimmyvandenboom.github.io/Testomgeving-apps-en-tools-/
 
-## Gebruik — versie 1.3.1
+## Gebruik — versie 1.4.0
+
+De interface heeft een donkerblauwe kop, witte tegels en blauwe actieknoppen. De tien icoontjes staan als aanraakbare knoppen in het venster App wijzigen; je ziet meteen welke gekozen is.
 
 - **Openen** opent de gekoppelde app. **Link instellen / Link wijzigen** past naam, link en icoon aan. Een lege link is toegestaan. Schooltools, lesmateriaal en roosters kun je zelf toevoegen via **App toevoegen**.
 - De **ster** maakt een app favoriet; favorieten staan altijd bovenaan. De **×** verwijdert een tegel na bevestiging.
 - **Volgorde wijzigen** toont sleephandgrepen en grote pijlknoppen. Sleep de handgreep met je vinger of muis, of gebruik de pijlen. Je verplaatst tegels binnen de favorieten of de overige apps; zet de ster aan/uit om van groep te veranderen. Scroll buiten de handgrepen door de pagina.
-- IJsland, AK MASTER, D&P, ChatGPT en GitHub hebben herkenbare, lokaal getekende symbolen. Kies bij het wijzigen een ander symbool of upload een eigen PNG/JPG/WebP van maximaal 2 MB. De afbeelding wordt lokaal bijgesneden en verkleind tot 128 × 128 pixels. Er worden geen afbeeldingen naar een server gestuurd.
+- IJsland, AK MASTER, D&P, ChatGPT en GitHub hebben herkenbare, lokaal getekende symbolen. Kies bij het wijzigen uit tien zichtbare symbolen (bergen, wereld, beoordelen, chat, code, lesmateriaal, rooster, gereedschap, raket en hart) of upload een eigen PNG/JPG/WebP van maximaal 2 MB. De afbeelding wordt lokaal bijgesneden en verkleind tot 128 × 128 pixels. Er worden geen afbeeldingen naar een server gestuurd.
 - **Back-up downloaden** maakt een JSON-bestand met je apps, volgorde, favorieten, iconen en bewaarde werkcontext. **Back-up herstellen** leest het bestand en vraagt bevestiging voordat het je huidige tegels vervangt. Ongeldige back-ups en onveilige links worden geweigerd. Download eventueel eerst een back-up van je huidige gegevens.
 - Onder aan de pagina staan het versienummer en **Controleer op updates**. Bij een nieuwe versie verandert de knop in **Vernieuwen**. Een open formulier wordt niet automatisch herladen. Updates vereisen internet en een afgeronde hostingdeployment.
 - Je gegevens blijven in `localStorage` van deze browser/installatie en dit webadres. Ze synchroniseren niet vanzelf tussen telefoons. Gebruik een back-up voor overzetten. Het wissen van websitegegevens wist je wijzigingen; een andere browser of domeinnaam heeft zijn eigen gegevens.

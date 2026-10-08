@@ -194,9 +194,27 @@ const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
     await featurePage.reload();
     assert.deepEqual(await names(),['GitHub','AK MASTER','D&P beoordelen','ChatGPT','Expeditie IJsland','VABOK-project']);
     await featurePage.getByRole('button',{name:'Link voor AK MASTER wijzigen',exact:true}).click();
-    await featurePage.locator('#app-icon').selectOption('book');
+    assert.equal(await featurePage.locator('#icon-options button').count(),10);
+    for (const width of [320,390,1280]) {
+      await featurePage.setViewportSize({width,height:900});
+      assert(await featurePage.locator('#editor').evaluate(dialog=>dialog.scrollWidth<=dialog.clientWidth),`icon picker overflow at ${width}`);
+      assert(await featurePage.locator('#icon-options button').evaluateAll(buttons=>buttons.every(button=>button.getBoundingClientRect().width>=48 && button.getBoundingClientRect().height>=48)));
+    }
+    for (const label of ['Bergen','Wereld','Check','Chat','Code','Rooster','Tools','Raket','Hart','Boek']) {
+      await featurePage.getByRole('button',{name:label,exact:true}).click();
+      assert.equal(await featurePage.getByRole('button',{name:label,exact:true}).getAttribute('aria-pressed'),'true');
+      assert.equal(await featurePage.locator('#icon-options [aria-pressed="true"]').count(),1);
+    }
+    await featurePage.setViewportSize({width:390,height:844});
+    await featurePage.locator('#icon-options').scrollIntoViewIfNeeded();
+    await featurePage.screenshot({path:'/tmp/jimmy-icon-picker.png'});
+    await featurePage.setViewportSize({width:1280,height:1200});
+    assert.equal(await featurePage.getByRole('button',{name:'Boek',exact:true}).getAttribute('aria-pressed'),'true');
     await featurePage.getByRole('button',{name:'Opslaan',exact:true}).click();
     assert.equal(await featurePage.evaluate(()=>JSON.parse(localStorage.getItem('jimmy-apphub-v1')).find(app=>app.id==='ak').icon),'book');
+    await featurePage.getByRole('button',{name:'Link voor AK MASTER wijzigen',exact:true}).click();
+    assert.equal(await featurePage.getByRole('button',{name:'Boek',exact:true}).getAttribute('aria-pressed'),'true');
+    await featurePage.getByRole('button',{name:'Annuleren',exact:true}).first().click();
     await featurePage.getByRole('button',{name:'Link voor GitHub wijzigen',exact:true}).click();
     await featurePage.locator('#icon-file').setInputFiles(path.join(root,'icons/icon-192.png'));
     await featurePage.locator('#image-controls').waitFor({state:'visible'});

@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '1.3.1';
+const VERSION = '1.4.0';
 const STORAGE_KEY = 'jimmy-apphub-v1';
 const CONTEXT_KEY = 'jimmy-work-context-v1';
 const LINK_MARKERS = ['jimmy-iceland-link-v1', 'jimmy-ak-link-v1', 'jimmy-vabok-added-v1'];
@@ -20,9 +20,12 @@ const ICONS = {
   book: 'M19 9C13 3 7 3 3 4v27c6-2 11-1 16 3 5-4 10-5 16-3V4c-4-1-10-1-16 5Zm0 0v25',
   calendar: 'M5 8h28v27H5V8Zm6-5v10m16-10v10M5 16h28M12 23h2m5 0h2m5 0h2M12 29h2m5 0h2',
   tool: 'm8 30 14-14c-2-5 0-11 5-13l-1 8 6 1 4-6c2 7-3 13-9 12L12 34l-4-4Z',
+  rocket: 'M14 23C13 13 20 5 34 3c-1 14-9 21-19 20Zm9-13a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM14 14l-8 1-3 9 11-1m10 0-1 9-9 3 1-12M11 27l-6 6m2-7-4 4m9 0-4 5',
+  heart: 'M19 33 5 19C-4 10 8-3 19 9 30-3 42 10 33 19L19 33Z',
   star: 'm19 3 5 10 11 2-8 8 2 12-10-6-10 6 2-12-8-8 11-2 5-10Z',
   grip: 'M12 8h1m12 0h1M12 19h1m12 0h1M12 30h1m12 0h1'
 };
+const ICON_CHOICES = [['mountain','Bergen'],['globe','Wereld'],['check','Check'],['chat','Chat'],['code','Code'],['book','Boek'],['calendar','Rooster'],['tool','Tools'],['rocket','Raket'],['heart','Hart']];
 const DEFAULT_ICONS = { iceland: 'mountain', ak: 'globe', dp: 'check', chatgpt: 'chat', github: 'code', vabok: 'book' };
 const $ = id => document.getElementById(id);
 function safeUrl(value) {
@@ -156,11 +159,21 @@ function startDrag(event, app, card) {
 }
 $('reorder-apps').addEventListener('click', () => { reordering = !reordering; $('reorder-apps').setAttribute('aria-pressed', String(reordering)); $('reorder-apps').textContent = reordering ? 'Volgorde klaar' : 'Volgorde wijzigen'; $('reorder-help').hidden = !reordering; render(); });
 let editingId = null; let editingImage = ''; let imageBusy = false; let imageRequest = 0;
-function showImage() { $('image-controls').hidden = !editingImage; if (editingImage) $('icon-preview').src = editingImage; else $('icon-preview').removeAttribute('src'); }
+function showImage() {
+  $('image-controls').hidden = !editingImage;
+  if (editingImage) $('icon-preview').src = editingImage; else $('icon-preview').removeAttribute('src');
+  for (const button of $('icon-options').children) button.setAttribute('aria-pressed', String(!editingImage && button.dataset.icon === $('app-icon').value));
+}
+for (const [kind, label] of ICON_CHOICES) {
+  const button = element('button', 'icon-option'); button.type = 'button'; button.dataset.icon = kind;
+  button.append(graphic(kind), element('span', '', label)); button.setAttribute('aria-pressed', 'false');
+  button.addEventListener('click', () => { imageRequest++; imageBusy = false; editingImage = ''; $('icon-file').value = ''; $('app-icon').value = kind; showImage(); });
+  $('icon-options').append(button);
+}
 function editApp(app = null) {
   editingId = app?.id ?? null; editingImage = app?.image ?? ''; imageRequest++; imageBusy = false;
   $('editor-title').textContent = app ? 'App wijzigen' : 'App toevoegen'; $('app-name').value = app?.name ?? ''; $('app-url').value = app?.url ?? '';
-  $('app-icon').value = app?.icon ?? 'auto'; $('icon-file').value = ''; $('form-error').textContent = ''; showImage(); $('editor').showModal(); $(app ? 'app-url' : 'app-name').focus();
+  $('app-icon').value = app?.icon && app.icon !== 'auto' ? app.icon : (DEFAULT_ICONS[app?.id] || 'tool'); $('icon-file').value = ''; $('form-error').textContent = ''; showImage(); $('editor').showModal(); $(app ? 'app-url' : 'app-name').focus();
 }
 $('add-app').addEventListener('click', () => editApp());
 $('cancel-editor').addEventListener('click', () => $('editor').close());
