@@ -1,15 +1,16 @@
 'use strict';
-const VERSION = '1.4.2';
+const VERSION = '1.4.3';
 const STORAGE_KEY = 'jimmy-apphub-v1';
 const CONTEXT_KEY = 'jimmy-work-context-v1';
-const LINK_MARKERS = ['jimmy-iceland-link-v1', 'jimmy-ak-link-v1', 'jimmy-vabok-added-v1'];
+const LINK_MARKERS = ['jimmy-iceland-link-v1', 'jimmy-ak-link-v1', 'jimmy-vabok-added-v1', 'jimmy-srilanka-added-v1'];
 const defaults = [
   { id: 'iceland', name: 'Expeditie IJsland', url: 'https://jimmyvandenboom.github.io/Expeditie-ijsland-2027-/' },
   { id: 'ak', name: 'AK MASTER', url: 'https://jimmyvandenboom.github.io/AK-MASTER-app-/' },
   { id: 'dp', name: 'D&P beoordelen', url: '' },
   { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/' },
   { id: 'github', name: 'GitHub', url: 'https://github.com/' },
-  { id: 'vabok', name: 'VABOK-project', url: 'https://jimmyvandenboom.github.io/VABOK-project-/' }
+  { id: 'vabok', name: 'VABOK-project', url: 'https://jimmyvandenboom.github.io/VABOK-project-/' },
+  { id: 'srilanka', name: 'Sri Lanka 2027', url: 'https://jimmyvandenboom.github.io/Sri-Lanka-2027/' }
 ];
 const ICONS = {
   mountain: 'M3 27 13 8l7 12 5-8 10 15H3Zm6-11 4-8 5 8-5-2-4 2Z',
@@ -26,7 +27,7 @@ const ICONS = {
   grip: 'M12 8h1m12 0h1M12 19h1m12 0h1M12 30h1m12 0h1'
 };
 const ICON_CHOICES = [['mountain','Bergen'],['globe','Wereld'],['check','Check'],['chat','Chat'],['code','Code'],['book','Boek'],['calendar','Rooster'],['tool','Tools'],['rocket','Raket'],['heart','Hart']];
-const DEFAULT_ICONS = { iceland: 'mountain', ak: 'globe', dp: 'check', chatgpt: 'chat', github: 'code', vabok: 'book' };
+const DEFAULT_ICONS = { iceland: 'mountain', ak: 'globe', dp: 'check', chatgpt: 'chat', github: 'code', vabok: 'book', srilanka: 'globe' };
 const $ = id => document.getElementById(id);
 function safeUrl(value) {
   if (typeof value !== 'string') return '';
@@ -69,6 +70,22 @@ try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
     }
     if (exists || apps.some(app => app.id === project.id)) localStorage.setItem(LINK_MARKERS[2], 'done');
+  }
+  // Add the trip once; also recognize an existing link with a cache-busting query.
+  if (localStorage.getItem(LINK_MARKERS[3]) !== 'done') {
+    const trip = defaults.find(app => app.id === 'srilanka');
+    const destination = new URL(trip.url);
+    const exists = apps.some(app => {
+      if (app.id === trip.id) return true;
+      if (!app.url) return false;
+      const saved = new URL(app.url);
+      return saved.origin === destination.origin && saved.pathname.replace(/\/+$/, '') === destination.pathname.replace(/\/+$/, '');
+    });
+    if (!exists && apps.length < 200) {
+      apps = [...apps, ...normalizeApps([trip])];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
+    }
+    if (exists || apps.some(app => app.id === trip.id)) localStorage.setItem(LINK_MARKERS[3], 'done');
   }
   workContext = (localStorage.getItem(CONTEXT_KEY) || '').slice(0, 10000);
 } catch { $('status').textContent = 'Je opgeslagen apps konden niet worden geladen. De standaardapps worden getoond.'; }

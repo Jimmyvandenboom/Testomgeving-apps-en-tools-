@@ -1,10 +1,10 @@
 # Mijn apps · Jimmy
 
-Een mobiele persoonlijke apphub zonder framework, analytics of installatie van dependencies. De standaardtegels zijn Expeditie IJsland, AK MASTER, D&P beoordelen, ChatGPT, GitHub en VABOK-project. IJsland en AK MASTER hebben hun links; D&P blijft leeg tot zijn link bekend is.
+Een mobiele persoonlijke apphub zonder framework, analytics of installatie van dependencies. De standaardtegels zijn Expeditie IJsland, AK MASTER, D&P beoordelen, ChatGPT, GitHub, VABOK-project en Sri Lanka 2027. IJsland en AK MASTER hebben hun links; D&P blijft leeg tot zijn link bekend is.
 
 Apphub: https://jimmyvandenboom.github.io/Testomgeving-apps-en-tools-/
 
-## Gebruik — versie 1.4.2
+## Gebruik — versie 1.4.3
 
 De startpagina toont de persoonlijke foto uit `jimmy.png`, klein en schuin in een witte fotolijst; deze is ook offline beschikbaar. De interface heeft een donkerblauwe kop, witte tegels en blauwe actieknoppen. De tien icoontjes staan als aanraakbare knoppen in het venster App wijzigen; je ziet meteen welke gekozen is.
 
@@ -16,6 +16,8 @@ De startpagina toont de persoonlijke foto uit `jimmy.png`, klein en schuin in ee
 - Onder aan de pagina staan het versienummer en **Controleer op updates**. Bij een nieuwe versie verandert de knop in **Vernieuwen**. Een open formulier wordt niet automatisch herladen. Updates vereisen internet en een afgeronde hostingdeployment.
 - Je gegevens blijven in `localStorage` van deze browser/installatie en dit webadres. Ze synchroniseren niet vanzelf tussen telefoons. Gebruik een back-up voor overzetten. Het wissen van websitegegevens wist je wijzigingen; een andere browser of domeinnaam heeft zijn eigen gegevens.
 - De apphub werkt na een eerste online bezoek offline. Externe apps en ChatGPT hebben hun eigen internetverbinding en toegangsregels. Gebruik geen wachtwoorden of geheime tokens in app-links.
+
+De tegel **Sri Lanka 2027** opent de bladerbare kijkversie op https://jimmyvandenboom.github.io/Sri-Lanka-2027/. Deze tegel wordt eenmalig toegevoegd aan bestaande installaties, zonder je eigen tegels, volgorde of favorieten te vervangen. Een al aanwezige link naar dezelfde reis wordt niet dubbel toegevoegd. Na bewust verwijderen blijft de tegel weg.
 
 ## Werkassistent
 
